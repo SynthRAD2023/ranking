@@ -1,5 +1,4 @@
 import csv
-import numpy as np
 import json
 import warnings
 
@@ -29,72 +28,67 @@ def create_export_dict(csv_file):
     return export_dict, metrics_dict
 
 
-
-
-
-def define_best_and_worst(metrics_dict):
-    global_min = {}
-    global_max = {}
+def define_best_and_worst(metrics_dict, aggregate='mean'):
+    best, worst = {}, {}
+    global_min, global_max = {}, {}
     for i, (submission, metrics) in enumerate(metrics_dict.items()):
         for metric, values in metrics.items():
-            if metric not in global_min.keys():
-                global_min[metric] = values['mean']
+            if i == 0:
+                global_min[metric] = values[aggregate]
+                global_max[metric] = values[aggregate]
             else:
-                global_min[metric] = min([global_min[metric], values['mean']])
-            
-            if metric not in global_max.keys():
-                global_max[metric] = values['mean']
+                global_min[metric] = min([global_min[metric], values[aggregate]])
+                global_max[metric] = max([global_max[metric], values[aggregate]])
+                          
+            if metric in ['psnr', 'ssim']:
+                # a good performance is a high value
+                best[metric] = global_max[metric]
+                worst[metric] = global_min[metric]
             else:
-                global_max[metric] = max([global_max[metric], values['mean']])
-    return global_min, global_max
+                # a good performance is a low value
+                best[metric] = global_min[metric]
+                worst[metric] = global_max[metric]
+    
+    print('\t\t\t\tWorst \t\tBest')
+    for metric in best.keys():
+        print(f"{metric:16} {worst[metric]:.2f} \t\t{best[metric]:.2f}")
+    print()
+    return best, worst
 
 
 def normalize_metrics(metrics_dict):
-    global_min, global_max = define_best_and_worst(metrics_dict)
+    best, worst = define_best_and_worst(metrics_dict)
     
     normalized = {}
     for i, (submission, metrics) in enumerate(metrics_dict.items()):
         normalized[submission] = {}
         for metric, values in metrics.items():
-            if metric.lower() in ['psnr', 'ssim']:
-                # a good performance is a high value
-                best = global_max[metric]
-                worst = global_min[metric]
-            else:
-                # a good performance is a low value
-                best = global_min[metric]
-                worst = global_max[metric]     
             
-    
-        
-            # Normalize all results
-            if best == worst:
+            # Normalize all results (0=worst score, 1=best score)
+            if best[metric] == worst[metric]:
                 normalized[submission][metric] = 0.5
             else:
-                normalized[submission][metric] = (values['mean'] - worst) / (best - worst)
+                normalized[submission][metric] = (values['mean'] - worst[metric]) / (best[metric] - worst[metric])
+        normalized[submission]['sum'] = sum(normalized[submission].values())
     return normalized
-                                        
-    
-def rank(normalized_results):
-    keys = ['psnr', 'mae', 'ssim']
-    
-    final_ranking = {}
-    for metric in keys:
-        all_values = [values[metric] for _, values in normalized_results.items()]
-        all_names = [submission for submission, _ in normalized_results.items()]
-        final_ranking[metric] = sorted(zip(all_values, all_names))
-        
-        for x in final_ranking[metric]:
-            print(x[1], x[0])
 
+    
+def rank(normalized_results, metrics_dict, export_dict):
+    sorted_results = (sorted(normalized_results.items(), key=lambda x:x[1]['sum'], reverse=True))
+    print('Rank \tTeam \t\t\t\tSummed normalized metrics')
+    for team_rank, res in enumerate(sorted_results):
+        team = export_dict[res[0]]['title']
+        team = team[team.find(' ')+1:]
+        print(f"{team_rank:04d} \t{team:20}\t{res[1]['sum']:.2f}")
+    
 
     
 if __name__=="__main__":
-    leader_board_export = '../val_exports/export_val_task1_20230703_after.csv'
+    leader_board_export = 'leaderboard_export.csv'
     export_dict, metrics_dict = create_export_dict(leader_board_export)
     
     normalized_results = normalize_metrics(metrics_dict)
-    rank(normalized_results)
+    rank(normalized_results, metrics_dict, export_dict)
     
     
     
