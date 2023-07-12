@@ -15,19 +15,7 @@
 
 
   <p align="center">
-    Preparing the metrics for evaluation of 
-<a href="https://synthrad2023.grand-challenge.org/"><strong>SynthRAD2023 Grand Challenge</strong></a>
-  <br />
-    <a href="https://github.com/SynthRAD2023/metrics"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/SynthRAD2023/metrics">View Demo</a>
-    ·
-    <a href="https://github.com/SynthRAD2023/metrics/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/SynthRAD2023/metrics/issues">Request Feature</a>
-  </p>
-</p>
+
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
