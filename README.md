@@ -84,7 +84,7 @@ Distributed under the GNU General Public License v3.0. See `LICENSE` for more in
 
 Matteo Maspero - [@matteomasperonl](https://twitter.com/matteomasperonl) - m.maspero@umcutrecht.nl
 
-Project Link: [https://github.com/SynthRAD2023/metrics](https://github.com/SynthRAD2023/metrics)
+Project Link: [https://github.com/SynthRAD2023/ranking](https://github.com/SynthRAD2023/ranking)
 
 
 <!-- ACKNOWLEDGEMENTS 
