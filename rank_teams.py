@@ -39,7 +39,7 @@ def define_best_and_worst(metrics_dict, aggregate='mean'):
                 global_min[metric] = min([global_min[metric], values[aggregate]])
                 global_max[metric] = max([global_max[metric], values[aggregate]])
                           
-            if metric in ['psnr', 'ssim']:
+            if metric in ['psnr', 'ssim', 'gamma_photon', 'gamma_proton']:
                 # a good performance is a high value
                 best[metric] = global_max[metric]
                 worst[metric] = global_min[metric]
@@ -82,7 +82,7 @@ def rank_and_save(normalized_results, metrics_dict, export_dict, aggregate='mean
         for team_rank, (submission, result) in enumerate(sorted_results):
             team = export_dict[submission]['title']
             team = team[team.find(' ')+1:]
-            print(f"{team_rank+1:04d} \t{team:20}\t{result['sum']:.2f}")
+            print(f"{team_rank+1:2d}   \t{team:20}\t{result['sum']:.2f}")
             
             save_row = [team_rank+1, team, submission, result['sum']]
             if team_rank == 0:
